@@ -3,31 +3,44 @@ import { Header, Feed, Divider, Label } from 'semantic-ui-react';
 import { capitalize, toLower } from 'lodash/string';
 
 const { ipcRenderer, remote } = require('electron');
-
 const config = remote.getGlobal('config');
+const notification = remote.getGlobal('notification');
 
-class Logs extends React.Component {
-  constructor() {
+class Logs extends React.Component
+{
+  constructor()
+  {
     super();
     this.state = { entries: [] };
   }
 
-  componentDidMount() {
-    ipcRenderer.on('logupdated', (event, message) => {
+  componentDidMount ()
+  {
+    // notification.on("show", () =>
+    // {
+    //     const noise = new Audio('../assets/eventually.mp3');
+    //     noise.play();
+    // });
+
+    ipcRenderer.on('logupdated', (event, message) =>
+    {
       this.update(message);
     });
     this.setState({ entries: ipcRenderer.sendSync('logGetEntries') });
   }
 
-  componentWillUnmount() {
+  componentWillUnmount ()
+  {
     ipcRenderer.removeAllListeners('logupdated');
   }
 
-  update(entries) {
+  update (entries)
+  {
     this.setState({ entries });
   }
 
-  labelColor(logType) {
+  labelColor (logType)
+  {
     switch (toLower(logType)) {
       case 'info':
         return 'blue';
@@ -44,9 +57,14 @@ class Logs extends React.Component {
     }
   }
 
-  render() {
-    const LogEntries = this.state.entries.map(entry => {
-      if (entry.type !== 'debug' || config.Config.App.debug) {
+  render ()
+  {
+
+
+    const LogEntries = this.state.entries.map(entry =>
+    {
+      if (entry.type !== 'debug' || config.Config.App.debug) 
+      {
         return (
           <Feed key={entry.id} className="log" size="small">
             <Feed.Event>
@@ -63,9 +81,8 @@ class Logs extends React.Component {
               </Feed.Content>
             </Feed.Event>
             <Divider />
-          </Feed>
-        );
-      }
+          </Feed>);
+       }
     });
 
     return (

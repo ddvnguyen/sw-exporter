@@ -9,6 +9,7 @@ let config = remote.getGlobal('config');
 class SettingsItem extends React.Component {
   constructor(props) {
     super(props);
+
     if (this.props.section === 'Plugins') {
       this.state = { value: config.Config[this.props.section][this.props.pluginName][this.props.setting] };
     } else {

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, shell, Tray, Notification } = require('electron');
 const fs = require('fs-extra');
 const storage = require('electron-json-storage');
 const windowStateKeeper = require('electron-window-state');
@@ -7,9 +7,40 @@ const SWProxy = require('./proxy/SWProxy');
 
 const path = require('path');
 const url = require('url');
+const { isFunction } = require('lodash');
 
 global.gMapping = require('./mapping');
 global.appVersion = app.getVersion();
+
+  // for Notification Win 10 
+  app.setAppUserModelId(process.execPath);
+app.allowRendererProcessReuse = true;
+
+
+
+app.on('ready', () => 
+{
+  app.notificationSound = null;
+  app.notification = global.notification = new Notification
+    ({
+      title: "SW Exporter Notification",
+      body: "SW Exporter Notification"
+    });
+
+  app.showNotification = (title) =>
+  {
+    app.notification.title = title;
+    app.notification.show();
+  };
+
+  tray = new Tray("assets/icon.ico");
+
+  tray.setToolTip('Sw Exporter')
+  tray.on('click', () =>
+  {
+    global.win.show();
+  });
+});
 
 let defaultFilePath = path.join(app.getPath('desktop'), `${app.name} Files`);
 let defaultConfig = {
@@ -32,7 +63,8 @@ let defaultConfigDetails = {
   }
 };
 
-function createWindow() {
+function createWindow ()
+{
   let mainWindowState = windowStateKeeper({
     defaultWidth: 800,
     defaultHeight: 600
@@ -52,6 +84,12 @@ function createWindow() {
     }
   });
 
+  global.win.on('minimize', function (event)
+  {
+    event.preventDefault();
+    global.win.hide();
+  });
+
   global.mainWindowId = win.id;
 
   win.loadURL(
@@ -64,7 +102,8 @@ function createWindow() {
 
   mainWindowState.manage(win);
 
-  win.webContents.on('new-window', (e, link) => {
+  win.webContents.on('new-window', (e, link) =>
+  {
     e.preventDefault();
     shell.openExternal(link);
   });
@@ -72,25 +111,30 @@ function createWindow() {
 
 const proxy = new SWProxy();
 
-proxy.on('error', () => {});
+proxy.on('error', () => { });
 
-ipcMain.on('proxyIsRunning', event => {
+ipcMain.on('proxyIsRunning', event =>
+{
   event.returnValue = proxy.isRunning();
 });
 
-ipcMain.on('proxyGetInterfaces', event => {
+ipcMain.on('proxyGetInterfaces', event =>
+{
   event.returnValue = proxy.getInterfaces();
 });
 
-ipcMain.on('proxyStart', () => {
+ipcMain.on('proxyStart', () =>
+{
   proxy.start(config.Config.Proxy.port);
 });
 
-ipcMain.on('proxyStop', () => {
+ipcMain.on('proxyStop', () =>
+{
   proxy.stop();
 });
 
-ipcMain.on('getCert', async () => {
+ipcMain.on('getCert', async () =>
+{
   const fileExists = await fs.pathExists(path.join(app.getPath('userData'), 'swcerts', 'certs', 'ca.pem'));
   if (fileExists) {
     const copyPath = path.join(global.config.Config.App.filesPath, 'cert', 'ca.pem');
@@ -109,17 +153,21 @@ ipcMain.on('getCert', async () => {
   }
 });
 
-ipcMain.on('logGetEntries', event => {
+ipcMain.on('logGetEntries', event =>
+{
   event.returnValue = proxy.getLogEntries();
 });
 
-ipcMain.on('updateConfig', () => {
-  storage.set('Config', config.Config, error => {
+ipcMain.on('updateConfig', () =>
+{
+  storage.set('Config', config.Config, error =>
+  {
     if (error) throw error;
   });
 });
 
-ipcMain.on('getFolderLocations', event => {
+ipcMain.on('getFolderLocations', event =>
+{
   event.returnValue = {
     settings: app.getPath('userData')
   };
@@ -127,15 +175,18 @@ ipcMain.on('getFolderLocations', event => {
 
 global.plugins = [];
 
-function loadPlugins() {
+function loadPlugins ()
+{
   // Initialize Plugins
   let plugins = [];
 
   const pluginDirs = [path.join(__dirname, 'plugins'), path.join(global.config.Config.App.filesPath, 'plugins')];
 
   // Load each plugin module in the folder
-  pluginDirs.forEach(dir => {
-    fs.readdirSync(dir).forEach(file => {
+  pluginDirs.forEach(dir =>
+  {
+    fs.readdirSync(dir).forEach(file =>
+    {
       const plug = require(path.join(dir, file));
 
       // Check plugin for correct shape
@@ -152,10 +203,12 @@ function loadPlugins() {
   });
 
   // Initialize plugins
-  plugins.forEach(plug => {
+  plugins.forEach(plug =>
+  {
     // try to parse JSON for textareas
     config.Config.Plugins[plug.pluginName] = _.merge(plug.defaultConfig, config.Config.Plugins[plug.pluginName]);
-    Object.entries(config.Config.Plugins[plug.pluginName]).forEach(([key, value]) => {
+    Object.entries(config.Config.Plugins[plug.pluginName]).forEach(([key, value]) =>
+    {
       if (
         plug.defaultConfigDetails &&
         plug.defaultConfigDetails[key] &&
@@ -185,7 +238,8 @@ function loadPlugins() {
   return plugins;
 }
 
-app.on('ready', () => {
+app.on('ready', () =>
+{
   app.setAppUserModelId(process.execPath);
   createWindow();
 
@@ -211,7 +265,8 @@ app.on('ready', () => {
     );
   }
 
-  storage.getAll((error, data) => {
+  storage.getAll((error, data) =>
+  {
     if (error) throw error;
 
     global.config = _.merge(defaultConfig, data);
@@ -228,7 +283,8 @@ app.on('ready', () => {
   });
 });
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', () =>
+{
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
@@ -236,7 +292,8 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('activate', () => {
+app.on('activate', () =>
+{
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (win === null) {

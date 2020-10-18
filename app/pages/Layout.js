@@ -5,14 +5,22 @@ import { Segment, Menu, Icon, Button } from 'semantic-ui-react';
 import Mousetrap from 'mousetrap';
 
 import Head from '../components/Head';
-
-const appVersion = require('electron').remote.app.getVersion();
+const { remote } = require('electron');
+const appVersion = remote.app.getVersion();
+const notification = remote.getGlobal('notification');
 
 class Layout extends React.Component {
   constructor() {
+
     super();
     this.state = { activeItem: 'logs', compactMode: false };
     this.toggleCompactMode = this.toggleCompactMode.bind(this);
+
+    notification.on("show", () =>
+    {
+        const noise = new Audio('../assets/eventually.mp3');
+        noise.play();
+    });
 
     Mousetrap.bind(['command+1', 'alt+1'], () => {
       this.navigate('/', 'logs');
