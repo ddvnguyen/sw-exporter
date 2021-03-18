@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, shell, Tray } = require('electron');
 const fs = require('fs-extra');
 const storage = require('electron-json-storage');
 const windowStateKeeper = require('electron-window-state');
@@ -8,16 +8,18 @@ const SWProxy = require('./proxy/SWProxy');
 const path = require('path');
 const url = require('url');
 
+const iconPath = path.join(process.resourcesPath, 'icon.ico');
+
 global.gMapping = require('./mapping');
 global.appVersion = app.getVersion();
 
 let defaultFilePath = path.join(app.getPath('desktop'), `${app.name} Files`);
 let defaultConfig = {
   Config: {
-    App: { filesPath: defaultFilePath, debug: false, clearLogOnLogin: false, maxLogEntries: 100, httpsMode: true },
+    App: { filesPath: defaultFilePath, debug: false, clearLogOnLogin: false, maxLogEntries: 100, httpsMode: false, minimizeToTray: false },
     Proxy: { port: 8080, autoStart: false },
-    Plugins: {}
-  }
+    Plugins: {},
+  },
 };
 let defaultConfigDetails = {
   ConfigDetails: {
@@ -25,17 +27,18 @@ let defaultConfigDetails = {
       debug: { label: 'Show Debug Messages' },
       clearLogOnLogin: { label: 'Clear Log on every login' },
       maxLogEntries: { label: 'Maximum amount of log entries.' },
-      httpsMode: { label: 'HTTPS mode' }
+      httpsMode: { label: 'HTTPS mode' },
+      minimizeToTray: { label: 'Minimize to System Tray' },
     },
     Proxy: { autoStart: { label: 'Start proxy automatically' } },
-    Plugins: {}
-  }
+    Plugins: {},
+  },
 };
 
 function createWindow() {
   let mainWindowState = windowStateKeeper({
     defaultWidth: 800,
-    defaultHeight: 600
+    defaultHeight: 600,
   });
 
   global.win = new BrowserWindow({
@@ -48,17 +51,57 @@ function createWindow() {
     acceptFirstMouse: true,
     autoHideMenuBar: true,
     webPreferences: {
-      nodeIntegration: true
-    }
+      nodeIntegration: true,
+      // TODO: remote will be removed with electron 13, so this should be migrated to ipcRenderer.invoke at some point
+      enableRemoteModule: true,
+    },
   });
 
   global.mainWindowId = win.id;
+
+  function restoreWindowFromSystemTray() {
+    global.win.show();
+    if (bounds) {
+      global.win.setBounds(bounds);
+      bounds = undefined;
+    }
+  }
+
+  let appIcon = null;
+  let bounds = undefined;
+  app.whenReady().then(() => {
+    const iconExists = fs.existsSync(iconPath);
+    appIcon = new Tray(iconExists ? iconPath : './build/icon.ico');
+    appIcon.on('double-click', restoreWindowFromSystemTray);
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Show',
+        click: restoreWindowFromSystemTray,
+      },
+      {
+        label: 'Quit',
+        click: function () {
+          app.quit();
+        },
+      },
+    ]);
+
+    appIcon.setContextMenu(contextMenu);
+  });
+
+  global.win.on('minimize', function (event) {
+    if (!config.Config.App.minimizeToTray) return;
+
+    event.preventDefault();
+    bounds = global.win.getBounds();
+    global.win.hide();
+  });
 
   win.loadURL(
     url.format({
       pathname: path.join(__dirname, 'index.html'),
       protocol: 'file:',
-      slashes: true
+      slashes: true,
     })
   );
 
@@ -74,11 +117,11 @@ const proxy = new SWProxy();
 
 proxy.on('error', () => {});
 
-ipcMain.on('proxyIsRunning', event => {
+ipcMain.on('proxyIsRunning', (event) => {
   event.returnValue = proxy.isRunning();
 });
 
-ipcMain.on('proxyGetInterfaces', event => {
+ipcMain.on('proxyGetInterfaces', (event) => {
   event.returnValue = proxy.getInterfaces();
 });
 
@@ -98,30 +141,30 @@ ipcMain.on('getCert', async () => {
     proxy.log({
       type: 'success',
       source: 'proxy',
-      message: `Certificate copied to ${copyPath}.`
+      message: `Certificate copied to ${copyPath}.`,
     });
   } else {
     proxy.log({
       type: 'info',
       source: 'proxy',
-      message: 'No certificate available yet. You might have to start the proxy once and then try again.'
+      message: 'No certificate available yet. You might have to start the proxy once and then try again.',
     });
   }
 });
 
-ipcMain.on('logGetEntries', event => {
+ipcMain.on('logGetEntries', (event) => {
   event.returnValue = proxy.getLogEntries();
 });
 
 ipcMain.on('updateConfig', () => {
-  storage.set('Config', config.Config, error => {
+  storage.set('Config', config.Config, (error) => {
     if (error) throw error;
   });
 });
 
-ipcMain.on('getFolderLocations', event => {
+ipcMain.on('getFolderLocations', (event) => {
   event.returnValue = {
-    settings: app.getPath('userData')
+    settings: app.getPath('userData'),
   };
 });
 
@@ -134,8 +177,9 @@ function loadPlugins() {
   const pluginDirs = [path.join(__dirname, 'plugins'), path.join(global.config.Config.App.filesPath, 'plugins')];
 
   // Load each plugin module in the folder
-  pluginDirs.forEach(dir => {
-    fs.readdirSync(dir).forEach(file => {
+  pluginDirs.forEach((dir) => {
+    const filteredPlugins = fs.readdirSync(dir).filter((item) => !/(^|\/)\.[^\/\.]/g.test(item));
+    filteredPlugins.forEach((file) => {
       const plug = require(path.join(dir, file));
 
       // Check plugin for correct shape
@@ -145,14 +189,14 @@ function loadPlugins() {
         proxy.log({
           type: 'error',
           source: 'proxy',
-          message: `Invalid plugin ${file}. Missing one or more required module exports.`
+          message: `Invalid plugin ${file}. Missing one or more required module exports.`,
         });
       }
     });
   });
 
   // Initialize plugins
-  plugins.forEach(plug => {
+  plugins.forEach((plug) => {
     // try to parse JSON for textareas
     config.Config.Plugins[plug.pluginName] = _.merge(plug.defaultConfig, config.Config.Plugins[plug.pluginName]);
     Object.entries(config.Config.Plugins[plug.pluginName]).forEach(([key, value]) => {
@@ -177,7 +221,7 @@ function loadPlugins() {
       proxy.log({
         type: 'error',
         source: 'proxy',
-        message: `Error initializing ${plug.pluginName}: ${error.message}`
+        message: `Error initializing ${plug.pluginName}: ${error.message}`,
       });
     }
   });
@@ -204,9 +248,9 @@ app.on('ready', () => {
             { role: 'paste' },
             { role: 'pasteandmatchstyle' },
             { role: 'delete' },
-            { role: 'selectall' }
-          ]
-        }
+            { role: 'selectall' },
+          ],
+        },
       ])
     );
   }

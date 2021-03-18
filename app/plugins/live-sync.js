@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
   defaultConfig: {
-    enabled: false
+    enabled: false,
   },
   pluginName: 'LiveSync',
   pluginDescription: 'Keep SWOP synched with SW.',
@@ -23,6 +23,9 @@ module.exports = {
         break;
       case 'SellRuneCraftItem':
         this.logSellCraft(proxy, req, resp);
+        break;
+      case 'SellArtifacts':
+        this.logSellArtifact(proxy, req, resp);
         break;
       case 'BattleDungeonResult':
       case 'BattleScenarioResult':
@@ -64,6 +67,12 @@ module.exports = {
       case 'EquipRuneList':
         this.logEquipRuneList(proxy, req, resp);
         break;
+      case 'UpdateArtifactOccupation':
+        this.logArtifactChanges(proxy, req, resp);
+        break;
+      case 'UpgradeArtifact':
+        this.logUpgradeArtifact(proxy, req, resp);
+        break;
       default:
         break;
     }
@@ -78,7 +87,7 @@ module.exports = {
 
     const outFile = fs.createWriteStream(path.join(config.Config.App.filesPath, 'live', filename), {
       flags: 'w',
-      autoClose: true
+      autoClose: true,
     });
 
     outFile.write(JSON.stringify(result, true, 2));
@@ -105,9 +114,11 @@ module.exports = {
       const rewards = resp.changed_item_list ? resp.changed_item_list : [];
 
       if (rewards) {
-        rewards.forEach(reward => {
+        rewards.forEach((reward) => {
           if (reward.type === 8) {
             this.saveAction(proxy, req.wizard_id, resp.tvalue, 'new_rune', { rune: reward.info });
+          } else if (reward.type === 73) {
+            this.saveAction(proxy, req.wizard_id, resp.tvalue, 'new_artifact', { artifact: reward.info });
           }
         });
       }
@@ -150,7 +161,7 @@ module.exports = {
     this.saveAction(proxy, req.wizard_id, resp.tvalue, 'equip_rune_list', {
       equip_rune_id_list: resp.equip_rune_id_list,
       unequip_rune_id_list: resp.unequip_rune_id_list,
-      unit_info: resp.unit_info
+      unit_info: resp.unit_info,
     });
   },
 
@@ -171,6 +182,20 @@ module.exports = {
     this.saveAction(proxy, req.wizard_id, resp.tvalue, 'sell_craft', { craft_id_list: req.craft_item_id_list });
   },
 
+  logUpgradeArtifact(proxy, req, resp) {
+    this.saveAction(proxy, req.wizard_id, resp.tvalue, 'upgrade_artifact', { artifact: resp.artifact });
+  },
+
+  logArtifactChanges(proxy, req, resp) {
+    this.saveAction(proxy, req.wizard_id, resp.tvalue, 'change_artifact', {
+      updates: req.updates,
+    });
+  },
+
+  logSellArtifact(proxy, req, resp) {
+    this.saveAction(proxy, req.wizard_id, resp.tvalue, 'sell_artifact', { artifact_id_list: req.artifact_ids });
+  },
+
   logRaid(proxy, req, resp) {
     const wizardId = resp.wizard_info.wizard_id;
     const winOrLost = resp.win_lose === 1 ? 'Win' : 'Lost';
@@ -188,5 +213,5 @@ module.exports = {
         }
       }
     }
-  }
+  },
 };
