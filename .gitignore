@@ -8,3 +8,7 @@ npm-debug.log
 *.log.*
 full_log.txt
 bundle.js
+/.github/workflows
+/bin
+/obj/Debug
+*.code-workspace

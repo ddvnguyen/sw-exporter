@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4b60c34b-918c-494c-b242-290801177197}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <ProjectView>ProjectFiles</ProjectView>
+    <StartupFile>webpack.config.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">16.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="package.json" />
+    <Content Include="README.md" />
+    <Content Include="webpack.config.js" />
+    <Content Include="app\index.html" />
+    <Content Include="app\bundle.js" />
+    <Content Include="app\main.js" />
+    <Content Include="app\mapping.js" />
+    <Content Include="app\View.js" />
+    <Content Include="assets\help_network_settings.png" />
+    <Content Include="assets\help_success.png" />
+    <Content Include="assets\icon.ico" />
+    <Content Include="build\icon.ico" />
+    <Content Include="css\style.css" />
+    <Content Include="app\components\Footer.js" />
+    <Content Include="app\components\Head.js" />
+    <Content Include="app\components\SettingsItem.js" />
+    <Content Include="app\components\SettingsPlugin.js" />
+    <Content Include="app\pages\Help.js" />
+    <Content Include="app\pages\Layout.js" />
+    <Content Include="app\pages\Logs.js" />
+    <Content Include="app\pages\Settings.js" />
+    <Content Include="app\plugins\example-plugin.js" />
+    <Content Include="app\plugins\friend-export.js" />
+    <Content Include="app\plugins\full-logger.js" />
+    <Content Include="app\plugins\live-sync.js" />
+    <Content Include="app\plugins\profile-export.js" />
+    <Content Include="app\plugins\run-logger.js" />
+    <Content Include="app\plugins\rune-drop-efficiency.js" />
+    <Content Include="app\plugins\swag-logger.js" />
+    <Content Include="app\plugins\swarfarm-logger.js" />
+    <Content Include="app\plugins\toa-logger.js" />
+    <Content Include="app\plugins\version-checker.js" />
+    <Content Include="app\proxy\smon_decryptor.js" />
+    <Content Include="app\proxy\SWProxy.js" />
+    <Content Include="assets\icons\star-awakened.png" />
+    <Content Include="assets\icons\star-unawakened.png" />
+    <Content Include="assets\runes\Accuracy.png" />
+    <Content Include="assets\runes\Blade.png" />
+    <Content Include="assets\runes\Despair.png" />
+    <Content Include="assets\runes\Destroy.png" />
+    <Content Include="assets\runes\Determination.png" />
+    <Content Include="assets\runes\Endure.png" />
+    <Content Include="assets\runes\Energy.png" />
+    <Content Include="assets\runes\Enhance.png" />
+    <Content Include="assets\runes\Fatal.png" />
+    <Content Include="assets\runes\Fight.png" />
+    <Content Include="assets\runes\Focus.png" />
+    <Content Include="assets\runes\Guard.png" />
+    <Content Include="assets\runes\Nemesis.png" />
+    <Content Include="assets\runes\Rage.png" />
+    <Content Include="assets\runes\Revenge.png" />
+    <Content Include="assets\runes\Shield.png" />
+    <Content Include="assets\runes\Swift.png" />
+    <Content Include="assets\runes\Tolerance.png" />
+    <Content Include="assets\runes\Vampire.png" />
+    <Content Include="assets\runes\Violent.png" />
+    <Content Include="assets\runes\Will.png" />
+    <Content Include="dist\assets\help_network_settings.png" />
+    <Content Include="dist\assets\help_success.png" />
+    <Content Include="dist\assets\icon.ico" />
+    <Content Include="dist\win-ia32-unpacked\LICENSE.electron.txt" />
+    <Content Include="dist\win-ia32-unpacked\LICENSES.chromium.html" />
+    <Content Include="dist\win-ia32-unpacked\vk_swiftshader_icd.json" />
+    <Content Include="dist\win-unpacked\LICENSE.electron.txt" />
+    <Content Include="dist\win-unpacked\LICENSES.chromium.html" />
+    <Content Include="dist\win-unpacked\vk_swiftshader_icd.json" />
+    <Content Include="dist\assets\icons\star-awakened.png" />
+    <Content Include="dist\assets\icons\star-unawakened.png" />
+    <Content Include="dist\assets\runes\Accuracy.png" />
+    <Content Include="dist\assets\runes\Blade.png" />
+    <Content Include="dist\assets\runes\Despair.png" />
+    <Content Include="dist\assets\runes\Destroy.png" />
+    <Content Include="dist\assets\runes\Determination.png" />
+    <Content Include="dist\assets\runes\Endure.png" />
+    <Content Include="dist\assets\runes\Energy.png" />
+    <Content Include="dist\assets\runes\Enhance.png" />
+    <Content Include="dist\assets\runes\Fatal.png" />
+    <Content Include="dist\assets\runes\Fight.png" />
+    <Content Include="dist\assets\runes\Focus.png" />
+    <Content Include="dist\assets\runes\Guard.png" />
+    <Content Include="dist\assets\runes\Nemesis.png" />
+    <Content Include="dist\assets\runes\Rage.png" />
+    <Content Include="dist\assets\runes\Revenge.png" />
+    <Content Include="dist\assets\runes\Shield.png" />
+    <Content Include="dist\assets\runes\Swift.png" />
+    <Content Include="dist\assets\runes\Tolerance.png" />
+    <Content Include="dist\assets\runes\Vampire.png" />
+    <Content Include="dist\assets\runes\Violent.png" />
+    <Content Include="dist\assets\runes\Will.png" />
+    <Content Include="dist\win-ia32-unpacked\resources\icon.ico" />
+    <Content Include="dist\win-unpacked\resources\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="app" />
+    <Folder Include="app\components" />
+    <Folder Include="app\pages" />
+    <Folder Include="app\plugins" />
+    <Folder Include="app\proxy" />
+    <Folder Include="app\proxy\binaries" />
+    <Folder Include="assets" />
+    <Folder Include="assets\icons" />
+    <Folder Include="assets\runes" />
+    <Folder Include="build" />
+    <Folder Include="css" />
+    <Folder Include="dist" />
+    <Folder Include="dist\assets" />
+    <Folder Include="dist\assets\icons" />
+    <Folder Include="dist\assets\runes" />
+    <Folder Include="dist\win-ia32-unpacked" />
+    <Folder Include="dist\win-ia32-unpacked\locales" />
+    <Folder Include="dist\win-ia32-unpacked\resources" />
+    <Folder Include="dist\win-ia32-unpacked\swiftshader" />
+    <Folder Include="dist\win-unpacked" />
+    <Folder Include="dist\win-unpacked\locales" />
+    <Folder Include="dist\win-unpacked\resources" />
+    <Folder Include="dist\win-unpacked\swiftshader" />
+    <Folder Include="sw-exporter" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

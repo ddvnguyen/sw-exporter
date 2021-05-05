@@ -1,11 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\app",
-    "\\app\\plugins",
-    "\\build",
-    "\\css"
+    "\\.github\\ISSUE_TEMPLATE",
+    "\\.github\\workflows"
   ],
-  "SelectedNode": "\\package.json",
   "PreviewInSolutionExplorer": false
 }
